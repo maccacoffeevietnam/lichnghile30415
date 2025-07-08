@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Trị Website Nghỉ Lễ</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --admin-primary: #2563eb;
+            --admin-secondary: #f3f4f6;
+            --admin-danger: #ef4444;
+            --admin-success: #10b981;
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background-color: #1e293b;
+            color: white;
+            padding-top: 20px;
+        }
+
+        .sidebar .nav-link {
+            color: #cbd5e1;
+            padding: 12px 20px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: var(--admin-primary);
+            color: white;
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .admin-card h3 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px 15px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--admin-primary);
+            border-color: var(--admin-primary);
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+
+        .btn-danger {
+            background-color: var(--admin-danger);
+            border-color: var(--admin-danger);
+        }
+
+        .btn-success {
+            background-color: var(--admin-success);
+            border-color: var(--admin-success);
+        }
+
+        .table {
+            border: 1px solid #e2e8f0;
+        }
+
+        .table thead {
+            background-color: #f8fafc;
+        }
+
+        .table th {
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 600;
+            color: #475569;
+            padding: 12px;
+        }
+
+        .holiday-date {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-inactive {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .preview-box {
+            background-color: #f8fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-box img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+        }
+
+        .tab-content {
+            padding-top: 20px;
+        }
+
+        .header-bar {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+        }
+
+        .header-bar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #1e293b;
+        }
+
+        .alert-custom {
+            border-left: 4px solid var(--admin-primary);
+            background-color: #eff6ff;
+            border-radius: 6px;
+        }
+
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+
+        .item-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .drag-handle {
+            cursor: move;
+            color: #94a3b8;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <h4 class="text-center mb-4">
+                    <i class="fas fa-cog"></i> Quản Trị
+                </h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#general" data-tab="general">
+                            <i class="fas fa-home"></i> Cài đặt chung
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#calendar" data-tab="calendar">
+                            <i class="fas fa-calendar"></i> Lịch nghỉ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#countdown" data-tab="countdown">
+                            <i class="fas fa-clock"></i> Đếm ngược
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#quotes" data-tab="quotes">
+                            <i class="fas fa-quote-left"></i> Châm ngôn
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#products" data-tab="products">
+                            <i class="fas fa-shopping-bag"></i> Sản phẩm
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tours" data-tab="tours">
+                            <i class="fas fa-map-marked-alt"></i> Tour du lịch
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#bookings" data-tab="bookings">
+                            <i class="fas fa-list"></i> Đơn đặt tour
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#popup" data-tab="popup">
+                            <i class="fas fa-window-restore"></i> Popup
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#seo" data-tab="seo">
+                            <i class="fas fa-search"></i> SEO
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#footer" data-tab="footer">
+                            <i class="fas fa-link"></i> Footer Links
+                        </a>
+                    </li>
+                    <li class="nav-item mt-4">
+                        <a class="nav-link" href="/" target="_blank">
+                            <i class="fas fa-external-link-alt"></i> Xem trang web
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <div class="header-bar">
+                    <h1>Bảng Điều Khiển Quản Trị</h1>
+                </div>
+
+                <div class="main-content">
+                    <!-- General Settings Tab -->
+                    <div class="tab-pane active" id="general-tab">
+                        <div class="admin-card">
+                            <h3><i class="fas fa-cog"></i> Cài Đặt Chung</h3>
+                            
+                            <div class="alert alert-custom">
+                                <i class="fas fa-info-circle"></i> 
+                                Các thẻ script cho Google Analytics, Tag Manager, Search Console được nhập vào đây sẽ tự động được chèn vào header của trang web.
+                            </div>
+
+                            <form id="general-settings-form">
+                                <div class="mb-3">
+                                    <label class="form-label">Google Analytics (GA4)</label>
+                                    <textarea class="form-control" id="ga4-code" rows="3" 
+                                        placeholder="Dán mã GA4 vào đây..."></textarea>
+                                    <small class="text-muted">Ví dụ: &lt;script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXX"&gt;&lt;/script&gt;</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Google Tag Manager</label>
+                                    <textarea class="form-control" id="gtm-code" rows="3" 
+                                        placeholder="Dán mã GTM vào đây..."></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Google Search Console</label>
+                                    <input type="text" class="form-control" id="gsc-code" 
+                                        placeholder="Mã xác minh Search Console">
+                                    <small class="text-muted">Ví dụ: &lt;meta name="google-site-verification" content="mã-của-bạn" /&gt;</small>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Lưu cài đặt
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Calendar Tab -->
+                    <div class="tab-pane" id="calendar-tab" style="display: none;">
+                        <div class="admin-card">
+                            <h3><i class="fas fa-calendar"></i> Quản Lý Ngày Nghỉ Lễ</h3>
+                            
+                            <form id="holiday-form" class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Chọn ngày</label>
+                                        <input type="date" class="form-control" id="holiday-date" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Tên ngày lễ</label>
+                                        <input type="text" class="form-control" id="holiday-name" 
+                                            placeholder="Ví dụ: Ngày Giải phóng miền Nam" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">
+                                    <i class="fas fa-plus"></i> Thêm ngày nghỉ
+                                </button>
+                            </form>
+
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Ngày</th>
+                                        <th>Tên ngày lễ</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="holidays-list">
+                                    <!-- Holidays will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Countdown Tab -->
+                    <div class="tab-pane" id="countdown-tab" style="display: none;">
+                        <div class="admin-card">
+                            <h3><i class="fas fa-clock"></i> Cài Đặt Đếm Ngược</h3>
+                            
+                            <form id="countdown-form">
+                                <div class="mb-3">
+                                    <label class="form-label">Chọn ngày giờ đếm ngược đến</label>
+                                    <input type="datetime-local" class="form-control" id="countdown-datetime" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Tiêu đề hiển thị</label>
+                                    <input type="text" class="form-control" id="countdown-title" 
+                                        value="Đếm Ngược Đến Ngày Lễ" placeholder="Nhập tiêu đề">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Lưu cài đặt
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Quotes Tab -->
+                    <div class="tab-pane" id="quotes-tab" style="display: none;">
+                        <div class="admin-card">
+                            <h3><i class="fas fa-quote-left"></i> Quản Lý Châm Ngôn</h3>
+                            
+                            <form id="quote-form" class="mb-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Nội dung châm ngôn</label>
+                                    <textarea class="form-control" id="quote-text" rows="2" 
+                                        placeholder="Nhập câu châm ngôn..." required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Tác giả</label>
+                                    <input type="text" class="form-control" id="quote-author" 
+                                        placeholder="Ví dụ: Hồ Chí Minh" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Thêm châm ngôn
+                                </button>
+                            </form>
+
+                            <div id="quotes-list">
+                                <!-- Quotes will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Tab -->
+                    <div class="tab-pane" id="products-tab" style="display: none;">
+                        <div class="admin-card">
+                            <h3><i class="fas fa-shopping-bag"></i> Quản Lý Sản Phẩm Affiliate</h3>
+                            
+                            <form id="product-form" class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Tên sản phẩm</label>
+                                        <input type="text" class="form-control" id="product-title" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Link hình ảnh</label>
+                                        <input type="url" class="form-control" id="product-image" 
+                                            placeholder="https://..." required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Link sản phẩm</label>
+                                        <input type="url" class="form-control" id="product-link" 
+                                            placeholder="https://..." required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">
+                                    <i class="fas fa-plus"></i> Thêm sản phẩm
+                                </button>
+                            </form>
+
+                            <div id="products-list">
+                                <!-- Products will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tours Tab -->
+                    <div class="tab-pane" id="tours-tab" style="display: none;">
+                        <div class="admin-card">
+                            <h3><i class="fas fa-map-marked-alt"></i> Quản Lý Tour Du Lịch</h3>
+                            
+                            <form id="tour-form" class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Tên tour</label>
+                                        <input type="text" class="form-control" id="tour-name" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Link hình ảnh</label>
+                                        <input type="url" class="form-control" id="tour-image" required>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Nơi khởi hành</label>
+                                        <input type="text" class="form-control" id="tour-departure" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Phương tiện</label>
+                                        <input type="text" class="form-control" id="tour-transport" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Ngày khởi hành</label>
+                                        <input type="text" class="form-control" id="tour-date" 
+                                            placeholder="30/04/2025" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Giá tour</label>
+                                        <input type="text" class="form-control" id="tour-price" 
+                                            placeholder="2,990,000 VNĐ" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">
+                                    <i class="fas fa-plus"></i> Thêm tour
+                                </button>
+                            </form>
+
+                            <div id="tours-list">
+                                <!-- Tours will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bookings Tab -->
+                    <div class="tab-pane" id="bookings-tab" style="display: none;">
+                        <div class="admin-card">
+                            <h3><i class="fas fa-list"></i> Danh Sách Đặt Tour</h3>
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã đơn</th>
+                                            <th>Tour</th>
+                                            <th>Họ tên</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bookings-list">
+                                        <!-- Bookings will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Popup Tab -->
+                    <div class="tab-pane" id="popup-tab" style="display: none;">
+                        <div class="admin-card">
+                            <h3><i class="fas fa-window-restore"></i> Cài Đặt Popup</h3>
+                            
+                            <form id="popup-form">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="popup-enabled">
+                                        <label class="form-check-label" for="popup-enabled">
+                                            Bật/Tắt Popup
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Thời gian hiển thị (giây)</label>
+                                    <input type="number" class="form-control" id="popup-delay" 
+                                        value="5" min="1" max="60">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Loại nội dung</label>
+                                    <select class="form-select" id="popup-type">
+                                        <option value="image">Hình ảnh</option>
+                                        <option value="text">Văn bản</option>
+                                        <option value="video">Video</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3" id="popup-content-area">
+                                    <label class="form-label">Nội dung popup</label>
+                                    <textarea class="form-control" id="popup-content" rows="4"
+                                        placeholder="Nhập nội dung HTML..."></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Lưu cài đặt
+                                </button>
+                            </form>
+
+                            <div class="mt-4">
+                                <h5>Xem trước:</h5>
+                                <div class="preview-box" id="popup-preview">
+                                    <p class="text-muted">Nội dung popup sẽ hiển thị ở đây</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEO Tab -->
+                    <div class="tab-pane" id="seo-tab" style="display: none;">
+                        <div class="admin-card">
+                            <h3><i class="fas fa-search"></i> Cài Đặt SEO</h3>
+                            
+                            <form id="seo-form">
+                                <div class="mb-3">
+                                    <label class="form-label">Tiêu đề trang (Title)</label>
+                                    <input type="text" class="form-control" id="meta-title" 
+                                        placeholder="Lịch Nghỉ Lễ 30/4 - 01/5">
+                                    <small class="text-muted">Tối ưu: 50-60 ký tự</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Mô tả (Meta Description)</label>
+                                    <textarea class="form-control" id="meta-description" rows="3"
+                                        placeholder="Mô tả ngắn gọn về trang web..."></textarea>
+                                    <small class="text-muted">Tối ưu: 150-160 ký tự</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Thẻ H1 chính</label>
+                                    <input type="text" class="form-control" id="h1-main" 
+                                        placeholder="Lịch Nghỉ Lễ 30/4 - 01/5">
+                                </div>
+
+                                <h5 class="mt-4 mb-3">Thẻ H2 cho từng phần:</h5>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">H2 - Phần đếm ngược</label>
+                                    <input type="text" class="form-control" id="h2-countdown" 
+                                        placeholder="Đếm Ngược Đến Ngày Lễ">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">H2 - Phần lịch</label>
+                                    <input type="text" class="form-control" id="h2-calendar" 
+                                        placeholder="Lịch Tháng 4 - Tháng 5">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">H2 - Phần châm ngôn</label>
+                                    <input type="text" class="form-control" id="h2-quotes" 
+                                        placeholder="Châm Ngôn Của Bác Hồ">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">H2 - Phần sản phẩm</label>
+                                    <input type="text" class="form-control" id="h2-products" 
+                                        placeholder="Sản Phẩm Cho Kỳ Nghỉ">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">H2 - Phần tour</label>
+                                    <input type="text" class="form-control" id="h2-tours" 
+                                        placeholder="Tour Du Lịch Nghỉ Lễ">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Lưu cài đặt SEO
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Footer Tab -->
+                    <div class="tab-pane" id="footer-tab" style="display: none;">
+                        <div class="admin-card">
+                            <h3><i class="fas fa-link"></i> Quản Lý Footer Links</h3>
+                            
+                            <form id="footer-link-form" class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Anchor Text</label>
+                                        <input type="text" class="form-control" id="link-text" 
+                                            placeholder="Ví dụ: Trang chủ" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">URL</label>
+                                        <input type="url" class="form-control" id="link-url" 
+                                            placeholder="https://..." required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">
+                                    <i class="fas fa-plus"></i> Thêm link
+                                </button>
+                            </form>
+
+                            <div id="footer-links-list">
+                                <!-- Links will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // API URL
+        const API_URL = window.location.origin + '/api';
+
+        // Tab Navigation
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class
+                document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(t => t.style.display = 'none');
+                
+                // Add active class
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).style.display = 'block';
+                
+                // Load data for tab
+                loadTabData(this.getAttribute('data-tab'));
+            });
+        });
+
+        // Load data based on tab
+        function loadTabData(tab) {
+            switch(tab) {
+                case 'general':
+                    loadGeneralSettings();
+                    break;
+                case 'calendar':
+                    loadHolidays();
+                    break;
+                case 'countdown':
+                    loadCountdownSettings();
+                    break;
+                case 'quotes':
+                    loadQuotes();
+                    break;
+                case 'products':
+                    loadProducts();
+                    break;
+                case 'tours':
+                    loadTours();
+                    break;
+                case 'bookings':
+                    loadBookings();
+                    break;
+                case 'popup':
+                    loadPopupSettings();
+                    break;
+                case 'seo':
+                    loadSeoSettings();
+                    break;
+                case 'footer':
+                    loadFooterLinks();
+                    break;
+            }
+        }
+
+        // Show/hide loading
+        function showLoading() {
+            document.querySelector('.loading-spinner').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.querySelector('.loading-spinner').style.display = 'none';
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        // General Settings
+        async function loadGeneralSettings() {
+            try {
+                const response = await fetch(`${API_URL}/settings`);
+                const settings = await response.json();
+                
+                document.getElementById('ga4-code').value = settings.ga4_code || '';
+                document.getElementById('gtm-code').value = settings.gtm_code || '';
+                document.getElementById('gsc-code').value = settings.gsc_code || '';
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        document.getElementById('general-settings-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            showLoading();
+            
+            const settings = [
+                { key: 'ga4_code', value: document.getElementById('ga4-code').value },
+                { key: 'gtm_code', value: document.getElementById('gtm-code').value },
+                { key: 'gsc_code', value: document.getElementById('gsc-code').value }
+            ];
+            
+            try {
+                for (const setting of settings) {
+                    await fetch(`${API_URL}/settings`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(setting)
+                    });
+                }
+                showNotification('Đã lưu cài đặt thành công!');
+            } catch (error) {
+                showNotification('Lỗi khi lưu cài đặt!', 'danger');
+            }
+            
+            hideLoading();
+        });
+
+        // Holidays Management
+        async function loadHolidays() {
+            try {
+                const response = await fetch(`${API_URL}/holidays`);
+                const holidays = await response.json();
+                
+                const tbody = document.getElementById('holidays-list');
+                tbody.innerHTML = '';
+                
+                holidays.forEach(holiday => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span class="holiday-date">${formatDate(holiday.date)}</span></td>
+                        <td>${holiday.name}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteHoliday(${holiday.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading holidays:', error);
+            }
+        }
+
+        document.getElementById('holiday-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const holiday = {
+                date: document.getElementById('holiday-date').value,
+                name: document.getElementById('holiday-name').value
+            };
+            
+            try {
+                await fetch(`${API_URL}/holidays`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(holiday)
+                });
+                
+                showNotification('Đã thêm ngày nghỉ thành công!');
+                this.reset();
+                loadHolidays();
+            } catch (error) {
+                showNotification('Lỗi khi thêm ngày nghỉ!', 'danger');
+            }
+        });
+
+        async function deleteHoliday(id) {
+            if (!confirm('Bạn có chắc muốn xóa ngày nghỉ này?')) return;
+            
+            try {
+                await fetch(`${API_URL}/holidays/${id}`, { method: 'DELETE' });
+                showNotification('Đã xóa ngày nghỉ!');
+                loadHolidays();
+            } catch (error) {
+                showNotification('Lỗi khi xóa!', 'danger');
+            }
+        }
+
+        // Countdown Settings
+        async function loadCountdownSettings() {
+            try {
+                const response = await fetch(`${API_URL}/settings`);
+                const settings = await response.json();
+                
+                if (settings.countdown_date) {
+                    const date = new Date(settings.countdown_date);
+                    document.getElementById('countdown-datetime').value = 
+                        date.toISOString().slice(0, 16);
+                }
+                
+                document.getElementById('countdown-title').value = 
+                    settings.countdown_title || 'Đếm Ngược Đến Ngày Lễ';
+            } catch (error) {
+                console.error('Error loading countdown settings:', error);
+            }
+        }
+
+        document.getElementById('countdown-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            showLoading();
+            
+            const datetime = new Date(document.getElementById('countdown-datetime').value);
+            const settings = [
+                { key: 'countdown_date', value: datetime.toISOString() },
+                { key: 'countdown_title', value: document.getElementById('countdown-title').value }
+            ];
+            
+            try {
+                for (const setting of settings) {
+                    await fetch(`${API_URL}/settings`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(setting)
+                    });
+                }
+                showNotification('Đã lưu cài đặt đếm ngược!');
+            } catch (error) {
+                showNotification('Lỗi khi lưu cài đặt!', 'danger');
+            }
+            
+            hideLoading();
+        });
+
+        // Quotes Management
+        async function loadQuotes() {
+            try {
+                const response = await fetch(`${API_URL}/quotes`);
+                const quotes = await response.json();
+                
+                const container = document.getElementById('quotes-list');
+                container.innerHTML = '';
+                
+                quotes.forEach(quote => {
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="mb-1"><i class="fas fa-quote-left text-muted"></i> ${quote.text}</p>
+                                <small class="text-muted">- ${quote.author} -</small>
+                            </div>
+                            <button class="btn btn-sm btn-danger" onclick="deleteQuote(${quote.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading quotes:', error);
+            }
+        }
+
+        document.getElementById('quote-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const quote = {
+                text: document.getElementById('quote-text').value,
+                author: document.getElementById('quote-author').value
+            };
+            
+            try {
+                await fetch(`${API_URL}/quotes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(quote)
+                });
+                
+                showNotification('Đã thêm châm ngôn!');
+                this.reset();
+                loadQuotes();
+            } catch (error) {
+                showNotification('Lỗi khi thêm châm ngôn!', 'danger');
+            }
+        });
+
+        async function deleteQuote(id) {
+            if (!confirm('Bạn có chắc muốn xóa châm ngôn này?')) return;
+            
+            try {
+                await fetch(`${API_URL}/quotes/${id}`, { method: 'DELETE' });
+                showNotification('Đã xóa châm ngôn!');
+                loadQuotes();
+            } catch (error) {
+                showNotification('Lỗi khi xóa!', 'danger');
+            }
+        }
+
+        // Products Management
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${API_URL}/products`);
+                const products = await response.json();
+                
+                const container = document.getElementById('products-list');
+                container.innerHTML = '';
+                
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.innerHTML = `
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                <img src="${product.image}" alt="${product.title}" 
+                                    class="img-fluid rounded" style="max-height: 60px;">
+                            </div>
+                            <div class="col-md-4">
+                                <strong>${product.title}</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="${product.link}" target="_blank" class="text-decoration-none">
+                                    ${product.link} <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        document.getElementById('product-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const product = {
+                title: document.getElementById('product-title').value,
+                image: document.getElementById('product-image').value,
+                link: document.getElementById('product-link').value
+            };
+            
+            try {
+                await fetch(`${API_URL}/products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(product)
+                });
+                
+                showNotification('Đã thêm sản phẩm!');
+                this.reset();
+                loadProducts();
+            } catch (error) {
+                showNotification('Lỗi khi thêm sản phẩm!', 'danger');
+            }
+        });
+
+        async function deleteProduct(id) {
+            if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+            
+            try {
+                await fetch(`${API_URL}/products/${id}`, { method: 'DELETE' });
+                showNotification('Đã xóa sản phẩm!');
+                loadProducts();
+            } catch (error) {
+                showNotification('Lỗi khi xóa!', 'danger');
+            }
+        }
+
+        // Tours Management
+        async function loadTours() {
+            try {
+                const response = await fetch(`${API_URL}/tours`);
+                const tours = await response.json();
+                
+                const container = document.getElementById('tours-list');
+                container.innerHTML = '';
+                
+                tours.forEach(tour => {
+                    const card = document.createElement('div');
+                    card.className = 'item-card mb-3';
+                    card.innerHTML = `
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img src="${tour.image}" alt="${tour.name}" 
+                                    class="img-fluid rounded" style="max-height: 100px;">
+                            </div>
+                            <div class="col-md-7">
+                                <h5>${tour.name}</h5>
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> ${tour.departure} | 
+                                    <i class="fas fa-bus"></i> ${tour.transport} | 
+                                    <i class="fas fa-calendar"></i> ${tour.date}
+                                </small>
+                                <div class="text-primary fw-bold">${tour.price}</div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-sm btn-danger" onclick="deleteTour(${tour.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading tours:', error);
+            }
+        }
+
+        document.getElementById('tour-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const tour = {
+                name: document.getElementById('tour-name').value,
+                image: document.getElementById('tour-image').value,
+                departure: document.getElementById('tour-departure').value,
+                transport: document.getElementById('tour-transport').value,
+                date: document.getElementById('tour-date').value,
+                price: document.getElementById('tour-price').value
+            };
+            
+            try {
+                await fetch(`${API_URL}/tours`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tour)
+                });
+                
+                showNotification('Đã thêm tour!');
+                this.reset();
+                loadTours();
+            } catch (error) {
+                showNotification('Lỗi khi thêm tour!', 'danger');
+            }
+        });
+
+        async function deleteTour(id) {
+            if (!confirm('Bạn có chắc muốn xóa tour này?')) return;
+            
+            try {
+                await fetch(`${API_URL}/tours/${id}`, { method: 'DELETE' });
+                showNotification('Đã xóa tour!');
+                loadTours();
+            } catch (error) {
+                showNotification('Lỗi khi xóa!', 'danger');
+            }
+        }
+
+        // Bookings Management
+        async function loadBookings() {
+            try {
+                const response = await fetch(`${API_URL}/bookings`);
+                const bookings = await response.json();
+                
+                const tbody = document.getElementById('bookings-list');
+                tbody.innerHTML = '';
+                
+                bookings.forEach(booking => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#${booking.id}</td>
+                        <td>${booking.tour}</td>
+                        <td>${booking.customer_name}</td>
+                        <td><a href="tel:${booking.customer_phone}">${booking.customer_phone}</a></td>
+                        <td>${formatDateTime(booking.created_at)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteBooking(${booking.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        async function deleteBooking(id) {
+            if (!confirm('Bạn có chắc muốn xóa đơn đặt tour này?')) return;
+            
+            try {
+                await fetch(`${API_URL}/bookings/${id}`, { method: 'DELETE' });
+                showNotification('Đã xóa đơn đặt tour!');
+                loadBookings();
+            } catch (error) {
+                showNotification('Lỗi khi xóa!', 'danger');
+            }
+        }
+
+        // Popup Settings
+        async function loadPopupSettings() {
+            try {
+                const response = await fetch(`${API_URL}/settings`);
+                const settings = await response.json();
+                
+                document.getElementById('popup-enabled').checked = settings.popup_enabled === 'true';
+                document.getElementById('popup-delay').value = settings.popup_delay || '5';
+                document.getElementById('popup-type').value = settings.popup_type || 'image';
+                document.getElementById('popup-content').value = settings.popup_content || '';
+                
+                updatePopupPreview();
+            } catch (error) {
+                console.error('Error loading popup settings:', error);
+            }
+        }
+
+        document.getElementById('popup-type').addEventListener('change', function() {
+            const contentArea = document.getElementById('popup-content-area');
+            const type = this.value;
+            
+            if (type === 'image') {
+                contentArea.innerHTML = `
+                    <label class="form-label">Link hình ảnh</label>
+                    <input type="url" class="form-control" id="popup-content" 
+                        placeholder="https://example.com/image.jpg">
+                    <label class="form-label mt-2">Link khi click vào ảnh (tùy chọn)</label>
+                    <input type="url" class="form-control" id="popup-link" 
+                        placeholder="https://example.com">
+                `;
+            } else if (type === 'video') {
+                contentArea.innerHTML = `
+                    <label class="form-label">Link video (YouTube/Vimeo)</label>
+                    <input type="url" class="form-control" id="popup-content" 
+                        placeholder="https://www.youtube.com/embed/...">
+                `;
+            } else {
+                contentArea.innerHTML = `
+                    <label class="form-label">Nội dung popup</label>
+                    <textarea class="form-control" id="popup-content" rows="4"
+                        placeholder="Nhập nội dung HTML..."></textarea>
+                `;
+            }
+        });
+
+        document.getElementById('popup-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            showLoading();
+            
+            const settings = [
+                { key: 'popup_enabled', value: document.getElementById('popup-enabled').checked.toString() },
+                { key: 'popup_delay', value: document.getElementById('popup-delay').value },
+                { key: 'popup_type', value: document.getElementById('popup-type').value },
+                { key: 'popup_content', value: document.getElementById('popup-content').value }
+            ];
+            
+            const popupLink = document.getElementById('popup-link');
+            if (popupLink) {
+                settings.push({ key: 'popup_link', value: popupLink.value });
+            }
+            
+            try {
+                for (const setting of settings) {
+                    await fetch(`${API_URL}/settings`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(setting)
+                    });
+                }
+                showNotification('Đã lưu cài đặt popup!');
+                updatePopupPreview();
+            } catch (error) {
+                showNotification('Lỗi khi lưu cài đặt!', 'danger');
+            }
+            
+            hideLoading();
+        });
+
+        function updatePopupPreview() {
+            const preview = document.getElementById('popup-preview');
+            const type = document.getElementById('popup-type').value;
+            const content = document.getElementById('popup-content').value;
+            
+            if (!content) {
+                preview.innerHTML = '<p class="text-muted">Nội dung popup sẽ hiển thị ở đây</p>';
+                return;
+            }
+            
+            if (type === 'image') {
+                preview.innerHTML = `<img src="${content}" alt="Popup" style="max-width: 100%; max-height: 300px;">`;
+            } else if (type === 'video') {
+                preview.innerHTML = `<iframe src="${content}" width="100%" height="300" frameborder="0"></iframe>`;
+            } else {
+                preview.innerHTML = content;
+            }
+        }
+
+        // SEO Settings
+        async function loadSeoSettings() {
+            try {
+                const response = await fetch(`${API_URL}/settings`);
+                const settings = await response.json();
+                
+                document.getElementById('meta-title').value = settings.meta_title || '';
+                document.getElementById('meta-description').value = settings.meta_description || '';
+                document.getElementById('h1-main').value = settings.h1_main || '';
+                document.getElementById('h2-countdown').value = settings.h2_countdown || '';
+                document.getElementById('h2-calendar').value = settings.h2_calendar || '';
+                document.getElementById('h2-quotes').value = settings.h2_quotes || '';
+                document.getElementById('h2-products').value = settings.h2_products || '';
+                document.getElementById('h2-tours').value = settings.h2_tours || '';
+            } catch (error) {
+                console.error('Error loading SEO settings:', error);
+            }
+        }
+
+        document.getElementById('seo-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            showLoading();
+            
+            const settings = [
+                { key: 'meta_title', value: document.getElementById('meta-title').value },
+                { key: 'meta_description', value: document.getElementById('meta-description').value },
+                { key: 'h1_main', value: document.getElementById('h1-main').value },
+                { key: 'h2_countdown', value: document.getElementById('h2-countdown').value },
+                { key: 'h2_calendar', value: document.getElementById('h2-calendar').value },
+                { key: 'h2_quotes', value: document.getElementById('h2-quotes').value },
+                { key: 'h2_products', value: document.getElementById('h2-products').value },
+                { key: 'h2_tours', value: document.getElementById('h2-tours').value }
+            ];
+            
+            try {
+                for (const setting of settings) {
+                    await fetch(`${API_URL}/settings`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(setting)
+                    });
+                }
+                showNotification('Đã lưu cài đặt SEO!');
+            } catch (error) {
+                showNotification('Lỗi khi lưu cài đặt!', 'danger');
+            }
+            
+            hideLoading();
+        });
+
+        // Footer Links Management
+        async function loadFooterLinks() {
+            try {
+                const response = await fetch(`${API_URL}/footer-links`);
+                const links = await response.json();
+                
+                const container = document.getElementById('footer-links-list');
+                container.innerHTML = '';
+                
+                links.forEach(link => {
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${link.text}</strong> - 
+                                <a href="${link.url}" target="_blank">${link.url}</a>
+                            </div>
+                            <button class="btn btn-sm btn-danger" onclick="deleteFooterLink(${link.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading footer links:', error);
+            }
+        }
+
+        document.getElementById('footer-link-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const link = {
+                text: document.getElementById('link-text').value,
+                url: document.getElementById('link-url').value
+            };
+            
+            try {
+                await fetch(`${API_URL}/footer-links`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(link)
+                });
+                
+                showNotification('Đã thêm link!');
+                this.reset();
+                loadFooterLinks();
+            } catch (error) {
+                showNotification('Lỗi khi thêm link!', 'danger');
+            }
+        });
+
+        async function deleteFooterLink(id) {
+            if (!confirm('Bạn có chắc muốn xóa link này?')) return;
+            
+            try {
+                await fetch(`${API_URL}/footer-links/${id}`, { method: 'DELETE' });
+                showNotification('Đã xóa link!');
+                loadFooterLinks();
+            } catch (error) {
+                showNotification('Lỗi khi xóa!', 'danger');
+            }
+        }
+
+        // Utility Functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN');
+        }
+
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('vi-VN');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTabData('general');
+        });
+    </script>
+</body>
+</html>

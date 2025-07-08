@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Nghỉ Lễ 30/4 - 01/5 | Đếm Ngược Ngày Lễ Lớn</title>
+    <meta name="description" content="Theo dõi lịch nghỉ lễ 30/4 và 01/5, đếm ngược thời gian, xem tour du lịch hấp dẫn cho kỳ nghỉ lễ">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --red-flag: #DA251D;
+            --yellow-star: #FFCD00;
+            --green-leaf: #009B48;
+            --bg-light: #F5F5F5;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-light);
+            color: #333;
+        }
+
+        /* Header */
+        .hero-section {
+            background: linear-gradient(135deg, var(--red-flag) 0%, #B91C1C 100%);
+            color: white;
+            padding: 60px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: var(--yellow-star);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            opacity: 0.1;
+        }
+
+        /* Calendar Section */
+        .calendar-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin: 30px 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .calendar-day.holiday {
+            background: linear-gradient(135deg, var(--red-flag), #B91C1C);
+            color: white;
+            border-color: var(--red-flag);
+            font-weight: bold;
+        }
+
+        .calendar-day.weekend {
+            background-color: #FEF3C7;
+        }
+
+        .day-number {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .day-label {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        /* Countdown Section */
+        .countdown-section {
+            background: linear-gradient(135deg, var(--green-leaf), #047857);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .countdown-box {
+            display: inline-block;
+            margin: 0 15px;
+            text-align: center;
+        }
+
+        .countdown-number {
+            font-size: 48px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+
+        /* Quote Section */
+        .quote-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin: 30px 0;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quote-section:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .quote-text {
+            font-size: 24px;
+            font-style: italic;
+            color: var(--red-flag);
+            margin-bottom: 15px;
+        }
+
+        .quote-author {
+            font-size: 16px;
+            color: #666;
+            text-align: right;
+        }
+
+        /* Product Section */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        /* Tour Section */
+        .tour-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .tour-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .tour-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .tour-info {
+            padding: 25px;
+        }
+
+        .tour-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--red-flag);
+            margin-bottom: 15px;
+        }
+
+        .tour-detail {
+            margin: 8px 0;
+            color: #666;
+        }
+
+        .tour-price {
+            font-size: 24px;
+            color: var(--green-leaf);
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .btn-book {
+            background: var(--red-flag);
+            color: white;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-book:hover {
+            background: #B91C1C;
+            transform: translateY(-2px);
+        }
+
+        /* Popup */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            animation: popupIn 0.5s ease;
+        }
+
+        @keyframes popupIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        /* Form Modal */
+        .booking-form {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        /* Footer Links */
+        .footer-links {
+            background: #333;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: var(--yellow-star);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .countdown-number {
+                font-size: 36px;
+            }
+            
+            .calendar-grid {
+                gap: 5px;
+            }
+            
+            .quote-text {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-3">Lịch Nghỉ Lễ 30/4 - 01/5</h1>
+            <p class="lead">Ngày Giải phóng miền Nam và Quốc tế Lao động</p>
+        </div>
+    </section>
+
+    <!-- Countdown Section -->
+    <div class="container">
+        <h2 class="text-center mt-5 mb-4">Đếm Ngược Đến Ngày Lễ</h2>
+        <div class="countdown-section">
+            <div id="countdown-display">
+                <div class="countdown-box">
+                    <div class="countdown-number" id="days">0</div>
+                    <div class="countdown-label">Ngày</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-number" id="hours">0</div>
+                    <div class="countdown-label">Giờ</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-number" id="minutes">0</div>
+                    <div class="countdown-label">Phút</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-number" id="seconds">0</div>
+                    <div class="countdown-label">Giây</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Section -->
+    <div class="container">
+        <h2 class="text-center mt-5 mb-4">Lịch Tháng 4 - Tháng 5</h2>
+        <div class="calendar-section">
+            <div class="row mb-3">
+                <div class="col text-center">
+                    <button class="btn btn-outline-primary" onclick="changeMonth(-1)">
+                        <i class="fas fa-chevron-left"></i> Tháng trước
+                    </button>
+                    <span class="mx-3 fs-5 fw-bold" id="current-month">Tháng 4/2025</span>
+                    <button class="btn btn-outline-primary" onclick="changeMonth(1)">
+                        Tháng sau <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- Calendar will be generated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Section -->
+    <div class="container">
+        <h2 class="text-center mt-5 mb-4">Châm Ngôn Của Bác Hồ</h2>
+        <div class="quote-section" id="quote-section">
+            <div class="quote-text" id="quote-text">
+                "Không có gì quý hơn độc lập, tự do"
+            </div>
+            <div class="quote-author" id="quote-author">
+                - Hồ Chí Minh -
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="container">
+        <h2 class="text-center mt-5 mb-4">Sản Phẩm Cho Kỳ Nghỉ</h2>
+        <div class="product-grid" id="product-grid">
+            <!-- Products will be loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Tours Section -->
+    <div class="container">
+        <h2 class="text-center mt-5 mb-4">Tour Du Lịch Nghỉ Lễ</h2>
+        <div class="row" id="tours-container">
+            <!-- Tours will be loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Footer Links -->
+    <footer class="footer-links mt-5">
+        <div class="container">
+            <div id="footer-links">
+                <!-- Links will be loaded dynamically -->
+            </div>
+        </div>
+    </footer>
+
+    <!-- Popup -->
+    <div class="popup-overlay" id="popup-overlay">
+        <div class="popup-content">
+            <span class="popup-close" onclick="closePopup()">&times;</span>
+            <div id="popup-body">
+                <!-- Popup content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Đặt Tour Du Lịch</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="booking-form" class="booking-form">
+                        <div class="form-group">
+                            <label>Tên tour:</label>
+                            <input type="text" class="form-control" id="tour-name" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Họ và tên:</label>
+                            <input type="text" class="form-control" id="customer-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại:</label>
+                            <input type="tel" class="form-control" id="customer-phone" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Gửi Thông Tin</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // API Configuration
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/api' 
+            : '/api';
+
+        // Calendar Data
+        let currentMonth = 3; // April (0-indexed)
+        let currentYear = 2025;
+        let holidays = ['2025-04-30', '2025-05-01'];
+
+        // Quotes Data
+        const quotes = [
+            { text: "Không có gì quý hơn độc lập, tự do", author: "Hồ Chí Minh" },
+            { text: "Đoàn kết, đoàn kết, đại đoàn kết. Thành công, thành công, đại thành công", author: "Hồ Chí Minh" },
+            { text: "Dân ta phải biết sử ta. Cho tường gốc tích nước nhà Việt Nam", author: "Hồ Chí Minh" },
+            { text: "Một dân tộc không biết lịch sử của mình thì không thể làm nên lịch sử", author: "Hồ Chí Minh" },
+            { text: "Có công mài sắt, có ngày nên kim", author: "Hồ Chí Minh" }
+        ];
+        let currentQuoteIndex = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            generateCalendar();
+            startCountdown();
+            startQuoteRotation();
+            loadProducts();
+            loadTours();
+            loadFooterLinks();
+            setupPopup();
+        });
+
+        // Calendar Functions
+        function generateCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            
+            // Add day labels
+            const dayLabels = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+            dayLabels.forEach(label => {
+                const dayLabel = document.createElement('div');
+                dayLabel.className = 'text-center fw-bold';
+                dayLabel.textContent = label;
+                grid.appendChild(dayLabel);
+            });
+            
+            // Get first day of month
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // Add empty cells
+            for (let i = 0; i < firstDay; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+            
+            // Add days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                if (holidays.includes(dateStr)) {
+                    dayElement.classList.add('holiday');
+                }
+                
+                const dayOfWeek = new Date(currentYear, currentMonth, day).getDay();
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    dayElement.classList.add('weekend');
+                }
+                
+                dayElement.innerHTML = `
+                    <div class="day-number">${day}</div>
+                    <div class="day-label">${dayLabels[dayOfWeek]}</div>
+                `;
+                
+                grid.appendChild(dayElement);
+            }
+            
+            // Update month display
+            const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                               'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+            document.getElementById('current-month').textContent = `${monthNames[currentMonth]}/${currentYear}`;
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar();
+        }
+
+        // Countdown Functions
+        function startCountdown() {
+            const targetDate = new Date('2025-04-30T00:00:00+07:00');
+            
+            function updateCountdown() {
+                const now = new Date();
+                const difference = targetDate - now;
+                
+                if (difference > 0) {
+                    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+                    
+                    document.getElementById('days').textContent = days;
+                    document.getElementById('hours').textContent = hours;
+                    document.getElementById('minutes').textContent = minutes;
+                    document.getElementById('seconds').textContent = seconds;
+                } else {
+                    document.getElementById('countdown-display').innerHTML = 
+                        '<div class="display-4">🎉 Chúc mừng ngày lễ! 🎉</div>';
+                }
+            }
+            
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
+        // Quote Functions
+        function startQuoteRotation() {
+            const quoteElement = document.getElementById('quote-section');
+            
+            function showNextQuote() {
+                currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+                updateQuote();
+            }
+            
+            function updateQuote() {
+                const quote = quotes[currentQuoteIndex];
+                document.getElementById('quote-text').textContent = `"${quote.text}"`;
+                document.getElementById('quote-author').textContent = `- ${quote.author} -`;
+            }
+            
+            // Auto rotate every 10 seconds
+            setInterval(showNextQuote, 10000);
+            
+            // Click to change
+            quoteElement.addEventListener('click', showNextQuote);
+        }
+
+        // Load Products
+        function loadProducts() {
+            // Sample products - in real app, load from API
+            const products = [
+                { title: 'Balo du lịch', image: 'https://via.placeholder.com/200', link: '#' },
+                { title: 'Máy ảnh mini', image: 'https://via.placeholder.com/200', link: '#' },
+                { title: 'Kem chống nắng', image: 'https://via.placeholder.com/200', link: '#' },
+                { title: 'Giày trekking', image: 'https://via.placeholder.com/200', link: '#' },
+                { title: 'Áo khoác gió', image: 'https://via.placeholder.com/200', link: '#' }
+            ];
+            
+            const container = document.getElementById('product-grid');
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${product.image}" alt="${product.title}" class="product-image">
+                    <div class="product-info">
+                        <div class="product-title">${product.title}</div>
+                        <a href="${product.link}" class="btn btn-sm btn-primary w-100">Xem chi tiết</a>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Load Tours
+        function loadTours() {
+            // Sample tours - in real app, load from API
+            const tours = [
+                {
+                    name: 'Tour Đà Lạt 3N2Đ',
+                    image: 'https://via.placeholder.com/400x250',
+                    departure: 'TP.HCM',
+                    transport: 'Xe du lịch',
+                    date: '30/04/2025',
+                    price: '2,990,000 VNĐ'
+                },
+                {
+                    name: 'Tour Phú Quốc 4N3Đ',
+                    image: 'https://via.placeholder.com/400x250',
+                    departure: 'TP.HCM',
+                    transport: 'Máy bay',
+                    date: '30/04/2025',
+                    price: '4,590,000 VNĐ'
+                }
+            ];
+            
+            const container = document.getElementById('tours-container');
+            tours.forEach(tour => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 mb-4';
+                col.innerHTML = `
+                    <div class="tour-card">
+                        <img src="${tour.image}" alt="${tour.name}" class="tour-image">
+                        <div class="tour-info">
+                            <h3 class="tour-title">${tour.name}</h3>
+                            <div class="tour-detail"><i class="fas fa-map-marker-alt"></i> Khởi hành: ${tour.departure}</div>
+                            <div class="tour-detail"><i class="fas fa-bus"></i> Phương tiện: ${tour.transport}</div>
+                            <div class="tour-detail"><i class="fas fa-calendar"></i> Ngày đi: ${tour.date}</div>
+                            <div class="tour-price">${tour.price}</div>
+                            <button class="btn btn-book" onclick="openBookingModal('${tour.name}')">
+                                <i class="fas fa-phone"></i> Tư vấn / Đặt tour
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        // Load Footer Links
+        function loadFooterLinks() {
+            // Sample links - in real app, load from API
+            const links = [
+                { text: 'Trang chủ', url: '#' },
+                { text: 'Giới thiệu', url: '#' },
+                { text: 'Liên hệ', url: '#' }
+            ];
+            
+            const container = document.getElementById('footer-links');
+            links.forEach(link => {
+                const a = document.createElement('a');
+                a.href = link.url;
+                a.textContent = link.text;
+                container.appendChild(a);
+            });
+        }
+
+        // Popup Functions
+        function setupPopup() {
+            // Show popup after 5 seconds
+            setTimeout(() => {
+                showPopup();
+            }, 5000);
+        }
+
+        function showPopup() {
+            const overlay = document.getElementById('popup-overlay');
+            const body = document.getElementById('popup-body');
+            
+            // Sample popup content
+            body.innerHTML = `
+                <h3 class="text-center mb-3">🎉 Ưu đãi đặc biệt nghỉ lễ 30/4!</h3>
+                <img src="https://via.placeholder.com/500x300" alt="Khuyến mãi" class="img-fluid mb-3">
+                <p class="text-center">Giảm đến 30% cho tất cả tour du lịch!</p>
+                <div class="text-center">
+                    <a href="#" class="btn btn-primary">Xem ngay</a>
+                </div>
+            `;
+            
+            overlay.style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('popup-overlay').style.display = 'none';
+        }
+
+        // Booking Functions
+        function openBookingModal(tourName) {
+            document.getElementById('tour-name').value = tourName;
+            const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
+            modal.show();
+        }
+
+        // Form submission
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const booking = {
+                tour: document.getElementById('tour-name').value,
+                name: document.getElementById('customer-name').value,
+                phone: document.getElementById('customer-phone').value,
+                date: new Date().toISOString()
+            };
+            
+            // In real app, send to server
+            console.log('Booking:', booking);
+            alert('Cảm ơn bạn! Chúng tôi sẽ liên hệ sớm nhất.');
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
+            
+            // Reset form
+            this.reset();
+        });
+
+        // Close popup when clicking overlay
+        document.getElementById('popup-overlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+    </script>
+</body>
+</html>
